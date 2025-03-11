@@ -233,18 +233,12 @@ export default createStore({
 
     fetchCategories({ commit }) {
       commit("SET_LOADING", true);
-      commit("SET_ERROR", null);
-      
-      try {
-        // Simulate API call
-        setTimeout(() => {
-          commit("SET_CATEGORIES", categoriesData);
-          commit("SET_LOADING", false);
-        }, 500);
-      } catch (error) {
-        commit("SET_ERROR", "Failed to load categories. Please try again.");
+
+      // Simulate API call
+      setTimeout(() => {
+        commit("SET_CATEGORIES", categoriesData);
         commit("SET_LOADING", false);
-      }
+      }, 500);
     },
 
     addToCart({ commit }, { productId, quantity = 1 }) {

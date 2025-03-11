@@ -1,0 +1,99 @@
+// Summer E-commerce Theme Variables
+$primary: #ff7e5f;
+$secondary: #feb47b;
+$success: #4ecdc4;
+$info: #6cb2eb;
+$warning: #ffce00;
+$danger: #e3342f;
+$light: #f8f9fa;
+$dark: #343a40;
+
+// Custom Colors
+$summer-blue: #00b4d8;
+$summer-teal: #48cae4;
+$summer-yellow: #ffdd00;
+$summer-coral: #ff7e5f;
+$summer-sand: #f8edeb;
+
+// Typography
+$font-family-sans-serif: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$headings-font-weight: 600;
+
+// Global styles
+body {
+  background-color: #fff;
+  color: $dark;
+  font-family: $font-family-sans-serif;
+  overflow-x: hidden;
+}
+
+// Utility classes
+.bg-summer-gradient {
+  background: linear-gradient(135deg, $summer-coral, $secondary);
+}
+
+.text-summer {
+  color: $summer-coral;
+}
+
+.btn-summer {
+  background: linear-gradient(135deg, $summer-coral, $secondary);
+  border: none;
+  color: white;
+  
+  &:hover {
+    background: linear-gradient(135deg, darken($summer-coral, 5%), darken($secondary, 5%));
+    color: white;
+  }
+}
+
+// Card styling
+.card {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Product image styling
+.product-img {
+  object-fit: cover;
+  transition: transform 0.5s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+// Section styling
+.section-title {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 2rem;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    width: 50px;
+    height: 3px;
+    background: linear-gradient(135deg, $summer-coral, $secondary);
+  }
+}
+
+// Custom container for featured products
+.featured-container {
+  padding: 3rem 0;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 1.5rem;
+  }
+}

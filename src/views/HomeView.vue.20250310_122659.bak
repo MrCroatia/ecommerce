@@ -1,23 +1,5 @@
 <template>
   <div class="home">
-    <!-- Loading Indicator -->
-    <div v-if="loading" class="text-center py-5">
-      <div class="spinner-border text-summer" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-      <p class="mt-2">Loading products...</p>
-    </div>
-    
-    <!-- Error Message -->
-    <div v-else-if="error" class="alert alert-danger my-4 container">
-      <i class="bi bi-exclamation-triangle-fill me-2"></i>
-      {{ error }}
-      <button class="btn btn-sm btn-outline-danger ms-3" @click="retryLoading">
-        Retry
-      </button>
-    </div>
-    
-    <div v-else>
     <!-- Hero Section -->
     <section class="hero-section">
       <div class="hero-content">
@@ -288,7 +270,6 @@
         </div>
       </div>
     </section>
-    </div>
   </div>
 </template>
 
@@ -309,14 +290,6 @@ export default {
       store.dispatch("initializeStore");
     });
 
-    const loading = computed(() => {
-      return store.state.loading;
-    });
-
-    const error = computed(() => {
-      return store.state.error;
-    });
-
     const categories = computed(() => {
       return store.getters.allCategories;
     });
@@ -329,18 +302,12 @@ export default {
       return store.getters.newArrivals.slice(0, 4);
     });
 
-    const retryLoading = () => {
-      store.dispatch("initializeStore");
-    };
-    
     return {
-      loading,
-      error,
       categories,
       featuredProducts,
       newArrivals,
-      retryLoading,
     };
+  },
 };
 </script>
 

@@ -329,17 +329,12 @@ export default {
       return store.getters.newArrivals.slice(0, 4);
     });
 
-    const retryLoading = () => {
-      store.dispatch("initializeStore");
-    };
-    
     return {
       loading,
       error,
       categories,
       featuredProducts,
       newArrivals,
-      retryLoading,
     };
 };
 </script>
