@@ -25,27 +25,27 @@
 </template>
 
 <script>
-export default {
-  name: "NotFoundView",
-};
+  export default {
+    name: 'NotFoundView',
+  };
 </script>
 
 <style lang="scss" scoped>
-.not-found-view {
-  min-height: 70vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.not-found-content {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.not-found-icon {
-  i {
-    opacity: 0.8;
+  .not-found-view {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-}
+
+  .not-found-content {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .not-found-icon {
+    i {
+      opacity: 0.8;
+    }
+  }
 </style>

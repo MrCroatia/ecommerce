@@ -156,64 +156,64 @@
 </template>
 
 <script>
-import { ref } from "vue";
+  import { ref } from 'vue';
 
-export default {
-  name: "ContactView",
-  setup() {
-    const form = ref({
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-    });
+  export default {
+    name: 'ContactView',
+    setup() {
+      const form = ref({
+        name: '',
+        email: '',
+        subject: '',
+        message: '',
+      });
 
-    const submitting = ref(false);
-    const formSubmitted = ref(false);
+      const submitting = ref(false);
+      const formSubmitted = ref(false);
 
-    const submitForm = () => {
-      submitting.value = true;
+      const submitForm = () => {
+        submitting.value = true;
 
-      // Simulate form submission
-      setTimeout(() => {
-        submitting.value = false;
-        formSubmitted.value = true;
-
-        // Reset form
-        form.value = {
-          name: "",
-          email: "",
-          subject: "",
-          message: "",
-        };
-
-        // Hide success message after 5 seconds
+        // Simulate form submission
         setTimeout(() => {
-          formSubmitted.value = false;
-        }, 5000);
-      }, 1500);
-    };
+          submitting.value = false;
+          formSubmitted.value = true;
 
-    return {
-      form,
-      submitting,
-      formSubmitted,
-      submitForm,
-    };
-  },
-};
+          // Reset form
+          form.value = {
+            name: '',
+            email: '',
+            subject: '',
+            message: '',
+          };
+
+          // Hide success message after 5 seconds
+          setTimeout(() => {
+            formSubmitted.value = false;
+          }, 5000);
+        }, 1500);
+      };
+
+      return {
+        form,
+        submitting,
+        formSubmitted,
+        submitForm,
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-.contact-icon {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  .contact-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-.map-container {
-  border: 1px solid #dee2e6;
-}
+  .map-container {
+    border: 1px solid #dee2e6;
+  }
 </style>

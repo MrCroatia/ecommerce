@@ -68,92 +68,92 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from "vue";
-import { useStore } from "vuex";
-import ProductCard from "@/components/products/ProductCard.vue";
+  import { ref, computed, onMounted, watch } from 'vue';
+  import { useStore } from 'vuex';
+  import ProductCard from '@/components/products/ProductCard.vue';
 
-export default {
-  name: "CategoryView",
-  components: {
-    ProductCard,
-  },
-  props: {
-    category: {
-      type: String,
-      required: true,
+  export default {
+    name: 'CategoryView',
+    components: {
+      ProductCard,
     },
-  },
-  setup(props) {
-    const store = useStore();
-    const loading = ref(true);
-    const sortBy = ref("featured");
+    props: {
+      category: {
+        type: String,
+        required: true,
+      },
+    },
+    setup(props) {
+      const store = useStore();
+      const loading = ref(true);
+      const sortBy = ref('featured');
 
-    // Initialize store
-    onMounted(() => {
-      loading.value = true;
-      store.dispatch("initializeStore").then(() => {
-        loading.value = false;
-      });
-    });
-
-    // Get category details
-    const categoryData = computed(() => {
-      return (
-        store.state.categories.find((cat) => cat.slug === props.category) || {}
-      );
-    });
-
-    const categoryName = computed(() => {
-      return categoryData.value.name || "Category Not Found";
-    });
-
-    const categoryDescription = computed(() => {
-      return categoryData.value.description || "";
-    });
-
-    // Get products for this category
-    const products = computed(() => {
-      return store.getters.productsByCategory(props.category);
-    });
-
-    // Apply sorting
-    const applySort = () => {
-      store.dispatch("applyFilters", { sortBy: sortBy.value });
-    };
-
-    // Watch for category changes in the URL
-    watch(
-      () => props.category,
-      () => {
+      // Initialize store
+      onMounted(() => {
         loading.value = true;
-        setTimeout(() => {
+        store.dispatch('initializeStore').then(() => {
           loading.value = false;
-        }, 300);
-      }
-    );
+        });
+      });
 
-    return {
-      loading,
-      categoryName,
-      categoryDescription,
-      products,
-      sortBy,
-      applySort,
-    };
-  },
-};
+      // Get category details
+      const categoryData = computed(() => {
+        return (
+          store.state.categories.find(cat => cat.slug === props.category) || {}
+        );
+      });
+
+      const categoryName = computed(() => {
+        return categoryData.value.name || 'Category Not Found';
+      });
+
+      const categoryDescription = computed(() => {
+        return categoryData.value.description || '';
+      });
+
+      // Get products for this category
+      const products = computed(() => {
+        return store.getters.productsByCategory(props.category);
+      });
+
+      // Apply sorting
+      const applySort = () => {
+        store.dispatch('applyFilters', { sortBy: sortBy.value });
+      };
+
+      // Watch for category changes in the URL
+      watch(
+        () => props.category,
+        () => {
+          loading.value = true;
+          setTimeout(() => {
+            loading.value = false;
+          }, 300);
+        }
+      );
+
+      return {
+        loading,
+        categoryName,
+        categoryDescription,
+        products,
+        sortBy,
+        applySort,
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-.category-header {
-  text-align: center;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.empty-category {
-  i {
-    opacity: 0.5;
+  .category-header {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
   }
-}
+
+  .empty-category {
+    i {
+      opacity: 0.5;
+    }
+  }
 </style>

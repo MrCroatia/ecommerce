@@ -160,224 +160,226 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from "vue";
-import { useStore } from "vuex";
-import { useRoute, useRouter } from "vue-router";
-import ProductCard from "@/components/products/ProductCard.vue";
+  import { ref, computed, onMounted, watch } from 'vue';
+  import { useStore } from 'vuex';
+  import { useRoute, useRouter } from 'vue-router';
+  import ProductCard from '@/components/products/ProductCard.vue';
 
-export default {
-  name: "ProductsView",
-  components: {
-    ProductCard,
-  },
-  setup() {
-    const store = useStore();
-    const route = useRoute();
-    const router = useRouter();
+  export default {
+    name: 'ProductsView',
+    components: {
+      ProductCard,
+    },
+    setup() {
+      const store = useStore();
+      const route = useRoute();
+      const router = useRouter();
 
-    const loading = ref(false);
-    const selectedCategory = ref(null);
-    const priceRange = ref([0, 100]);
-    const saleItemsOnly = ref(false);
-    const newArrivalsOnly = ref(false);
-    const sortBy = ref("featured");
+      const loading = ref(false);
+      const selectedCategory = ref(null);
+      const priceRange = ref([0, 100]);
+      const saleItemsOnly = ref(false);
+      const newArrivalsOnly = ref(false);
+      const sortBy = ref('featured');
 
-    // Initialize store and load products
-    onMounted(() => {
-      loading.value = true;
-      store.dispatch("initializeStore").then(() => {
-        loading.value = false;
+      // Initialize store and load products
+      onMounted(() => {
+        loading.value = true;
+        store.dispatch('initializeStore').then(() => {
+          loading.value = false;
 
-        // Check for URL params
-        if (route.query.category) {
+          // Check for URL params
+          if (route.query.category) {
+            const category = categories.value.find(
+              c => c.slug === route.query.category
+            );
+            if (category) {
+              selectedCategory.value = category.id;
+            }
+          }
+
+          if (route.query.sort) {
+            sortBy.value = route.query.sort;
+          }
+
+          if (route.query.sale === 'true') {
+            saleItemsOnly.value = true;
+          }
+
+          if (route.query.new === 'true') {
+            newArrivalsOnly.value = true;
+          }
+        });
+      });
+
+      // Get all categories from store
+      const categories = computed(() => {
+        return store.getters.allCategories;
+      });
+
+      // Get all products from store
+      const products = computed(() => {
+        return store.getters.allProducts;
+      });
+
+      // Filter and sort products based on selected filters
+      const filteredProducts = computed(() => {
+        let result = [...products.value];
+
+        // Apply category filter
+        if (selectedCategory.value) {
+          result = result.filter(
+            product => product.categoryId === selectedCategory.value
+          );
+        }
+
+        // Apply price range filter
+        result = result.filter(product => {
+          const price = product.salePrice || product.price;
+          return price >= priceRange.value[0] && price <= priceRange.value[1];
+        });
+
+        // Apply sale items filter
+        if (saleItemsOnly.value) {
+          result = result.filter(product => product.onSale);
+        }
+
+        // Apply new arrivals filter
+        if (newArrivalsOnly.value) {
+          result = result.filter(product => product.isNew);
+        }
+
+        // Apply sorting
+        switch (sortBy.value) {
+          case 'price-low-high':
+            result.sort((a, b) => {
+              const priceA = a.salePrice || a.price;
+              const priceB = b.salePrice || b.price;
+              return priceA - priceB;
+            });
+            break;
+          case 'price-high-low':
+            result.sort((a, b) => {
+              const priceA = a.salePrice || a.price;
+              const priceB = b.salePrice || b.price;
+              return priceB - priceA;
+            });
+            break;
+          case 'newest':
+            result.sort(
+              (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+            );
+            break;
+          case 'featured':
+          default:
+            // Featured products first, then sort by id
+            result.sort((a, b) => {
+              if (a.featured && !b.featured) return -1;
+              if (!a.featured && b.featured) return 1;
+              return a.id - b.id;
+            });
+        }
+
+        return result;
+      });
+
+      // Update URL when filters change
+      watch([selectedCategory, sortBy, saleItemsOnly, newArrivalsOnly], () => {
+        updateUrlParams();
+      });
+
+      // Apply filters and update URL
+      const applyFilters = () => {
+        updateUrlParams();
+      };
+
+      // Reset all filters
+      const resetFilters = () => {
+        selectedCategory.value = null;
+        priceRange.value = [0, 100];
+        saleItemsOnly.value = false;
+        newArrivalsOnly.value = false;
+        sortBy.value = 'featured';
+        updateUrlParams();
+      };
+
+      // Update URL params based on selected filters
+      const updateUrlParams = () => {
+        const query = {};
+
+        if (selectedCategory.value) {
           const category = categories.value.find(
-            (c) => c.slug === route.query.category
+            c => c.id === selectedCategory.value
           );
           if (category) {
-            selectedCategory.value = category.id;
+            query.category = category.slug;
           }
         }
 
-        if (route.query.sort) {
-          sortBy.value = route.query.sort;
+        if (sortBy.value !== 'featured') {
+          query.sort = sortBy.value;
         }
 
-        if (route.query.sale === "true") {
-          saleItemsOnly.value = true;
+        if (saleItemsOnly.value) {
+          query.sale = 'true';
         }
 
-        if (route.query.new === "true") {
-          newArrivalsOnly.value = true;
+        if (newArrivalsOnly.value) {
+          query.new = 'true';
         }
-      });
-    });
 
-    // Get all categories from store
-    const categories = computed(() => {
-      return store.getters.allCategories;
-    });
+        router.replace({ query });
+      };
 
-    // Get all products from store
-    const products = computed(() => {
-      return store.getters.allProducts;
-    });
-
-    // Filter and sort products based on selected filters
-    const filteredProducts = computed(() => {
-      let result = [...products.value];
-
-      // Apply category filter
-      if (selectedCategory.value) {
-        result = result.filter(
-          (product) => product.categoryId === selectedCategory.value
-        );
-      }
-
-      // Apply price range filter
-      result = result.filter((product) => {
-        const price = product.salePrice || product.price;
-        return price >= priceRange.value[0] && price <= priceRange.value[1];
-      });
-
-      // Apply sale items filter
-      if (saleItemsOnly.value) {
-        result = result.filter((product) => product.onSale);
-      }
-
-      // Apply new arrivals filter
-      if (newArrivalsOnly.value) {
-        result = result.filter((product) => product.isNew);
-      }
-
-      // Apply sorting
-      switch (sortBy.value) {
-        case "price-low-high":
-          result.sort((a, b) => {
-            const priceA = a.salePrice || a.price;
-            const priceB = b.salePrice || b.price;
-            return priceA - priceB;
-          });
-          break;
-        case "price-high-low":
-          result.sort((a, b) => {
-            const priceA = a.salePrice || a.price;
-            const priceB = b.salePrice || b.price;
-            return priceB - priceA;
-          });
-          break;
-        case "newest":
-          result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-          break;
-        case "featured":
-        default:
-          // Featured products first, then sort by id
-          result.sort((a, b) => {
-            if (a.featured && !b.featured) return -1;
-            if (!a.featured && b.featured) return 1;
-            return a.id - b.id;
-          });
-      }
-
-      return result;
-    });
-
-    // Update URL when filters change
-    watch([selectedCategory, sortBy, saleItemsOnly, newArrivalsOnly], () => {
-      updateUrlParams();
-    });
-
-    // Apply filters and update URL
-    const applyFilters = () => {
-      updateUrlParams();
-    };
-
-    // Reset all filters
-    const resetFilters = () => {
-      selectedCategory.value = null;
-      priceRange.value = [0, 100];
-      saleItemsOnly.value = false;
-      newArrivalsOnly.value = false;
-      sortBy.value = "featured";
-      updateUrlParams();
-    };
-
-    // Update URL params based on selected filters
-    const updateUrlParams = () => {
-      const query = {};
-
-      if (selectedCategory.value) {
-        const category = categories.value.find(
-          (c) => c.id === selectedCategory.value
-        );
-        if (category) {
-          query.category = category.slug;
-        }
-      }
-
-      if (sortBy.value !== "featured") {
-        query.sort = sortBy.value;
-      }
-
-      if (saleItemsOnly.value) {
-        query.sale = "true";
-      }
-
-      if (newArrivalsOnly.value) {
-        query.new = "true";
-      }
-
-      router.replace({ query });
-    };
-
-    return {
-      loading,
-      categories,
-      selectedCategory,
-      priceRange,
-      saleItemsOnly,
-      newArrivalsOnly,
-      sortBy,
-      filteredProducts,
-      applyFilters,
-      resetFilters,
-    };
-  },
-};
+      return {
+        loading,
+        categories,
+        selectedCategory,
+        priceRange,
+        saleItemsOnly,
+        newArrivalsOnly,
+        sortBy,
+        filteredProducts,
+        applyFilters,
+        resetFilters,
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-.filter-sidebar {
-  position: sticky;
-  top: 20px;
-}
+  .filter-sidebar {
+    position: sticky;
+    top: 20px;
+  }
 
-.filter-title {
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+  .filter-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
 
-.form-check-label {
-  font-size: 0.9rem;
-  cursor: pointer;
-}
+  .form-check-label {
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
 
-.price-slider {
-  position: relative;
+  .price-slider {
+    position: relative;
 
-  input[type="range"] {
-    position: absolute;
-    width: 100%;
+    input[type='range'] {
+      position: absolute;
+      width: 100%;
 
-    &:nth-child(1) {
-      z-index: 2;
-    }
+      &:nth-child(1) {
+        z-index: 2;
+      }
 
-    &:nth-child(2) {
-      z-index: 1;
+      &:nth-child(2) {
+        z-index: 1;
+      }
     }
   }
-}
 </style>

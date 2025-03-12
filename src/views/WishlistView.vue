@@ -115,90 +115,90 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from "vue";
-import { useStore } from "vuex";
-import { useRouter } from "vue-router";
+  import { ref, computed, onMounted } from 'vue';
+  import { useStore } from 'vuex';
+  import { useRouter } from 'vue-router';
 
-export default {
-  name: "WishlistView",
-  setup() {
-    const store = useStore();
-    const router = useRouter();
-    const loading = ref(true);
+  export default {
+    name: 'WishlistView',
+    setup() {
+      const store = useStore();
+      const router = useRouter();
+      const loading = ref(true);
 
-    // Initialize store
-    onMounted(() => {
-      loading.value = true;
-      store.dispatch("initializeStore").then(() => {
-        loading.value = false;
-      });
-    });
-
-    // Get wishlist items
-    const wishlistItems = computed(() => {
-      const wishlistIds = store.state.wishlist;
-      return store.state.products.filter((product) =>
-        wishlistIds.includes(product.id)
-      );
-    });
-
-    // Check if there are any in-stock items
-    const hasInStockItems = computed(() => {
-      return wishlistItems.value.some((product) => product.inStock);
-    });
-
-    // Add item to cart
-    const addToCart = (productId) => {
-      store.dispatch("addToCart", { productId, quantity: 1 });
-
-      // Show success message (could use a toast notification library in a real app)
-      alert("Product added to cart!");
-    };
-
-    // Remove item from wishlist
-    const removeFromWishlist = (productId) => {
-      store.dispatch("toggleWishlist", productId);
-    };
-
-    // Add all in-stock items to cart
-    const addAllToCart = () => {
-      const inStockItems = wishlistItems.value.filter(
-        (product) => product.inStock
-      );
-
-      inStockItems.forEach((product) => {
-        store.dispatch("addToCart", { productId: product.id, quantity: 1 });
+      // Initialize store
+      onMounted(() => {
+        loading.value = true;
+        store.dispatch('initializeStore').then(() => {
+          loading.value = false;
+        });
       });
 
-      // Navigate to cart
-      router.push("/cart");
-    };
+      // Get wishlist items
+      const wishlistItems = computed(() => {
+        const wishlistIds = store.state.wishlist;
+        return store.state.products.filter(product =>
+          wishlistIds.includes(product.id)
+        );
+      });
 
-    return {
-      loading,
-      wishlistItems,
-      hasInStockItems,
-      addToCart,
-      removeFromWishlist,
-      addAllToCart,
-    };
-  },
-};
+      // Check if there are any in-stock items
+      const hasInStockItems = computed(() => {
+        return wishlistItems.value.some(product => product.inStock);
+      });
+
+      // Add item to cart
+      const addToCart = productId => {
+        store.dispatch('addToCart', { productId, quantity: 1 });
+
+        // Show success message (could use a toast notification library in a real app)
+        alert('Product added to cart!');
+      };
+
+      // Remove item from wishlist
+      const removeFromWishlist = productId => {
+        store.dispatch('toggleWishlist', productId);
+      };
+
+      // Add all in-stock items to cart
+      const addAllToCart = () => {
+        const inStockItems = wishlistItems.value.filter(
+          product => product.inStock
+        );
+
+        inStockItems.forEach(product => {
+          store.dispatch('addToCart', { productId: product.id, quantity: 1 });
+        });
+
+        // Navigate to cart
+        router.push('/cart');
+      };
+
+      return {
+        loading,
+        wishlistItems,
+        hasInStockItems,
+        addToCart,
+        removeFromWishlist,
+        addAllToCart,
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-.product-title {
-  color: #343a40;
-  font-weight: 500;
+  .product-title {
+    color: #343a40;
+    font-weight: 500;
 
-  &:hover {
-    color: var(--bs-primary);
+    &:hover {
+      color: var(--bs-primary);
+    }
   }
-}
 
-.empty-wishlist {
-  i {
-    opacity: 0.5;
+  .empty-wishlist {
+    i {
+      opacity: 0.5;
+    }
   }
-}
 </style>

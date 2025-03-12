@@ -421,221 +421,223 @@
 </template>
 
 <script>
-import { ref } from "vue";
-import { useStore } from "vuex";
+  import { ref } from 'vue';
+  import { useStore } from 'vuex';
 
-export default {
-  name: "AccountView",
-  setup() {
-    const store = useStore();
-    const isLoggedIn = ref(false);
-    const activeTab = ref("dashboard");
-    const loginError = ref("");
-    const registerError = ref("");
-    const loggingIn = ref(false);
-    const registering = ref(false);
+  export default {
+    name: 'AccountView',
+    setup() {
+      const store = useStore();
+      const isLoggedIn = ref(false);
+      const activeTab = ref('dashboard');
+      const loginError = ref('');
+      const registerError = ref('');
+      const loggingIn = ref(false);
+      const registering = ref(false);
 
-    // Login form
-    const loginForm = ref({
-      email: "",
-      password: "",
-      rememberMe: false,
-    });
-
-    // Register form
-    const registerForm = ref({
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      agreeTerms: false,
-    });
-
-    // User data (would come from API in a real app)
-    const user = ref({
-      firstName: "John",
-      lastName: "Doe",
-      email: "john.doe@example.com",
-    });
-
-    // Mock data for orders
-    const orders = ref([
-      {
-        id: 1,
-        number: "ORD-123456",
-        date: new Date("2023-05-15"),
-        status: "Completed",
-        total: 129.99,
-      },
-      {
-        id: 2,
-        number: "ORD-123457",
-        date: new Date("2023-06-20"),
-        status: "Processing",
-        total: 79.5,
-      },
-    ]);
-
-    // Mock data for addresses
-    const addresses = ref([
-      {
-        id: 1,
-        type: "Shipping",
-        firstName: "John",
-        lastName: "Doe",
-        address: "123 Main St",
-        city: "Beach City",
-        state: "CA",
-        zipCode: "90210",
-        country: "US",
-      },
-    ]);
-
-    // Get wishlist count from store
-    const wishlistCount = ref(store.state.wishlist.length);
-
-    // Set active tab
-    const setActiveTab = (tab) => {
-      activeTab.value = tab;
-    };
-
-    // Format date
-    const formatDate = (date) => {
-      return new Date(date).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-    };
-
-    // Get status class
-    const getStatusClass = (status) => {
-      switch (status) {
-        case "Completed":
-          return "badge bg-success";
-        case "Processing":
-          return "badge bg-primary";
-        case "On Hold":
-          return "badge bg-warning text-dark";
-        case "Cancelled":
-          return "badge bg-danger";
-        default:
-          return "badge bg-secondary";
-      }
-    };
-
-    // Login function
-    const login = () => {
-      loggingIn.value = true;
-      loginError.value = "";
-
-      // Simulate API call
-      setTimeout(() => {
-        loggingIn.value = false;
-
-        // For demo purposes, always log in successfully with any credentials
-        isLoggedIn.value = true;
-      }, 1500);
-    };
-
-    // Register function
-    const register = () => {
-      registering.value = true;
-      registerError.value = "";
-
-      // Check if passwords match
-      if (registerForm.value.password !== registerForm.value.confirmPassword) {
-        registerError.value = "Passwords do not match";
-        registering.value = false;
-        return;
-      }
-
-      // Simulate API call
-      setTimeout(() => {
-        registering.value = false;
-
-        // For demo purposes, always register successfully
-        isLoggedIn.value = true;
-        user.value = {
-          firstName: registerForm.value.firstName,
-          lastName: registerForm.value.lastName,
-          email: registerForm.value.email,
-        };
-      }, 1500);
-    };
-
-    // Logout function
-    const logout = () => {
-      isLoggedIn.value = false;
-
-      // Reset forms
-      loginForm.value = {
-        email: "",
-        password: "",
+      // Login form
+      const loginForm = ref({
+        email: '',
+        password: '',
         rememberMe: false,
-      };
+      });
 
-      registerForm.value = {
-        firstName: "",
-        lastName: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
+      // Register form
+      const registerForm = ref({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
         agreeTerms: false,
-      };
-    };
+      });
 
-    return {
-      isLoggedIn,
-      activeTab,
-      loginForm,
-      registerForm,
-      loginError,
-      registerError,
-      loggingIn,
-      registering,
-      user,
-      orders,
-      addresses,
-      wishlistCount,
-      setActiveTab,
-      formatDate,
-      getStatusClass,
-      login,
-      register,
-      logout,
-    };
-  },
-};
+      // User data (would come from API in a real app)
+      const user = ref({
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john.doe@example.com',
+      });
+
+      // Mock data for orders
+      const orders = ref([
+        {
+          id: 1,
+          number: 'ORD-123456',
+          date: new Date('2023-05-15'),
+          status: 'Completed',
+          total: 129.99,
+        },
+        {
+          id: 2,
+          number: 'ORD-123457',
+          date: new Date('2023-06-20'),
+          status: 'Processing',
+          total: 79.5,
+        },
+      ]);
+
+      // Mock data for addresses
+      const addresses = ref([
+        {
+          id: 1,
+          type: 'Shipping',
+          firstName: 'John',
+          lastName: 'Doe',
+          address: '123 Main St',
+          city: 'Beach City',
+          state: 'CA',
+          zipCode: '90210',
+          country: 'US',
+        },
+      ]);
+
+      // Get wishlist count from store
+      const wishlistCount = ref(store.state.wishlist.length);
+
+      // Set active tab
+      const setActiveTab = tab => {
+        activeTab.value = tab;
+      };
+
+      // Format date
+      const formatDate = date => {
+        return new Date(date).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+      };
+
+      // Get status class
+      const getStatusClass = status => {
+        switch (status) {
+          case 'Completed':
+            return 'badge bg-success';
+          case 'Processing':
+            return 'badge bg-primary';
+          case 'On Hold':
+            return 'badge bg-warning text-dark';
+          case 'Cancelled':
+            return 'badge bg-danger';
+          default:
+            return 'badge bg-secondary';
+        }
+      };
+
+      // Login function
+      const login = () => {
+        loggingIn.value = true;
+        loginError.value = '';
+
+        // Simulate API call
+        setTimeout(() => {
+          loggingIn.value = false;
+
+          // For demo purposes, always log in successfully with any credentials
+          isLoggedIn.value = true;
+        }, 1500);
+      };
+
+      // Register function
+      const register = () => {
+        registering.value = true;
+        registerError.value = '';
+
+        // Check if passwords match
+        if (
+          registerForm.value.password !== registerForm.value.confirmPassword
+        ) {
+          registerError.value = 'Passwords do not match';
+          registering.value = false;
+          return;
+        }
+
+        // Simulate API call
+        setTimeout(() => {
+          registering.value = false;
+
+          // For demo purposes, always register successfully
+          isLoggedIn.value = true;
+          user.value = {
+            firstName: registerForm.value.firstName,
+            lastName: registerForm.value.lastName,
+            email: registerForm.value.email,
+          };
+        }, 1500);
+      };
+
+      // Logout function
+      const logout = () => {
+        isLoggedIn.value = false;
+
+        // Reset forms
+        loginForm.value = {
+          email: '',
+          password: '',
+          rememberMe: false,
+        };
+
+        registerForm.value = {
+          firstName: '',
+          lastName: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
+          agreeTerms: false,
+        };
+      };
+
+      return {
+        isLoggedIn,
+        activeTab,
+        loginForm,
+        registerForm,
+        loginError,
+        registerError,
+        loggingIn,
+        registering,
+        user,
+        orders,
+        addresses,
+        wishlistCount,
+        setActiveTab,
+        formatDate,
+        getStatusClass,
+        login,
+        register,
+        logout,
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-.account-nav {
-  .nav-link {
-    color: #495057;
-    padding: 0.5rem 0;
+  .account-nav {
+    .nav-link {
+      color: #495057;
+      padding: 0.5rem 0;
 
-    &:hover {
-      color: var(--bs-primary);
+      &:hover {
+        color: var(--bs-primary);
+      }
+
+      &.active {
+        color: var(--bs-primary);
+        font-weight: 500;
+      }
     }
+  }
 
-    &.active {
-      color: var(--bs-primary);
-      font-weight: 500;
+  .dashboard-icon {
+    i {
+      opacity: 0.8;
     }
   }
-}
 
-.dashboard-icon {
-  i {
-    opacity: 0.8;
+  .empty-orders {
+    i {
+      opacity: 0.5;
+    }
   }
-}
-
-.empty-orders {
-  i {
-    opacity: 0.5;
-  }
-}
 </style>

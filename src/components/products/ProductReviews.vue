@@ -68,7 +68,7 @@
           class="btn btn-outline-dark"
           @click="showReviewForm = !showReviewForm"
         >
-          {{ showReviewForm ? "Cancel Review" : "Write a Review" }}
+          {{ showReviewForm ? 'Cancel Review' : 'Write a Review' }}
         </button>
       </div>
 
@@ -218,219 +218,120 @@
   </div>
 </template>
 
+vue
 <script>
-import { ref, computed, onMounted } from "vue";
-
-export default {
-  name: "ProductReviews",
-  props: {
-    productId: {
-      type: Number,
-      required: true,
+  import { useStore } from 'vuex';
+  import { showToast } from '@/utils/notifications';
+  export default {
+    name: 'ProductReviews',
+    props: {
+      productId: {
+        type: Number,
+        required: true,
+      },
     },
-  },
-  setup(props) {
-    const loading = ref(true);
-    const reviews = ref([]);
-    const showReviewForm = ref(false);
-    const submitting = ref(false);
-    const displayCount = ref(5);
-
-    // New review form
-    const newReview = ref({
-      rating: 5,
-      title: "",
-      content: "",
-      name: "",
-      email: "",
-      date: null,
-      helpful: 0,
-    });
-
-    // Load reviews
-    onMounted(() => {
-      // Simulate API call to fetch reviews
-      setTimeout(() => {
-        // Mock data
-        reviews.value = [
-          {
-            rating: 5,
-            title: "Perfect for summer!",
-            content:
-              "I absolutely love this product. The quality is excellent and it's perfect for hot summer days. Highly recommend!",
-            name: "Sarah Johnson",
-            email: "sarah@example.com",
-            date: new Date("2023-06-15"),
-            helpful: 12,
-          },
-          {
-            rating: 4,
-            title: "Great quality",
-            content:
-              "The material is high quality and feels durable. The only reason I'm giving 4 stars instead of 5 is that the color was slightly different than shown in the pictures.",
-            name: "Michael Brown",
-            email: "michael@example.com",
-            date: new Date("2023-05-28"),
-            helpful: 8,
-          },
-          {
-            rating: 5,
-            title: "Exceeded expectations",
-            content:
-              "This product exceeded my expectations in every way. The design is beautiful and the functionality is perfect. Will definitely buy more items from this store!",
-            name: "Emily Wilson",
-            email: "emily@example.com",
-            date: new Date("2023-05-10"),
-            helpful: 15,
-          },
-          {
-            rating: 3,
-            title: "Good but not great",
-            content:
-              "The product is good for the price, but there are a few minor issues with the design that could be improved. Overall satisfied with my purchase though.",
-            name: "David Lee",
-            email: "david@example.com",
-            date: new Date("2023-04-22"),
-            helpful: 5,
-          },
-          {
-            rating: 5,
-            title: "Amazing summer essential",
-            content:
-              "This has become my go-to summer essential. The quality is outstanding and it looks even better in person than in the photos. Shipping was also very fast!",
-            name: "Jessica Martinez",
-            email: "jessica@example.com",
-            date: new Date("2023-04-15"),
-            helpful: 10,
-          },
-          {
-            rating: 4,
-            title: "Very satisfied",
-            content:
-              "I'm very satisfied with this purchase. The product is well-made and looks great. The only improvement I would suggest is more color options.",
-            name: "Robert Taylor",
-            email: "robert@example.com",
-            date: new Date("2023-03-30"),
-            helpful: 7,
-          },
-        ];
-
-        loading.value = false;
-      }, 1000);
-    });
-
-    // Calculate average rating
-    const averageRating = computed(() => {
-      if (reviews.value.length === 0) return 0;
-
-      const sum = reviews.value.reduce(
-        (total, review) => total + review.rating,
-        0
-      );
-      return sum / reviews.value.length;
-    });
-
-    // Sort reviews by date (newest first)
-    const sortedReviews = computed(() => {
-      const sorted = [...reviews.value].sort(
-        (a, b) => new Date(b.date) - new Date(a.date)
-      );
-      return sorted.slice(0, displayCount.value);
-    });
-
-    // Get rating count for a specific star rating
-    const getRatingCount = (rating) => {
-      return reviews.value.filter((review) => review.rating === rating).length;
-    };
-
-    // Get percentage for a specific star rating
-    const getRatingPercentage = (rating) => {
-      if (reviews.value.length === 0) return 0;
-      return (getRatingCount(rating) / reviews.value.length) * 100;
-    };
-
-    // Format date
-    const formatDate = (date) => {
-      return new Date(date).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+    setup(props) {
+      const loading = ref(true);
+      const reviews = ref([]);
+      const showReviewForm = ref(false);
+      const submitting = ref(false);
+      const displayCount = ref(5);
+      // New review form
+      const newReview = ref({
+        rating: 5,
+        title: '',
+        content: '',
+        name: '',
+        email: '',
+        date: null,
+        helpful: 0,
       });
-    };
-
-    // Mark review as helpful
-    const markHelpful = (index) => {
-      reviews.value[index].helpful++;
-    };
-
-    // Submit new review
-    const submitReview = () => {
-      submitting.value = true;
-
-      // Add current date
-      newReview.value.date = new Date();
-
-      // Simulate API call
-      setTimeout(() => {
-        // Add review to list
-        reviews.value.unshift({ ...newReview.value });
-
-        // Reset form
-        newReview.value = {
-          rating: 5,
-          title: "",
-          content: "",
-          name: "",
-          email: "",
-          date: null,
-          helpful: 0,
-        };
-
-        submitting.value = false;
-        showReviewForm.value = false;
-      }, 1500);
-    };
-
-    // Load more reviews
-    const loadMoreReviews = () => {
-      displayCount.value += 5;
-    };
-
-    return {
-      loading,
-      reviews,
-      showReviewForm,
-      submitting,
-      newReview,
-      displayCount,
-      averageRating,
-      sortedReviews,
-      getRatingCount,
-      getRatingPercentage,
-      formatDate,
-      markHelpful,
-      submitReview,
-      loadMoreReviews,
-    };
-  },
-};
+      // Calculate average rating
+      const averageRating = computed(() => {
+        if (reviews.value.length === 0) return 0;
+        const sum = reviews.value.reduce(
+          (total, review) => total + review.rating,
+          0
+        );
+        return sum / reviews.value.length;
+      });
+      // Get rating count for a specific star rating
+      const getRatingCount = rating => {
+        return reviews.value.filter(review => review.rating === rating).length;
+      };
+      // Get percentage for a specific star rating
+      const getRatingPercentage = rating => {
+        if (reviews.value.length === 0) return 0;
+        return (getRatingCount(rating) / reviews.value.length) * 100;
+      };
+      // Format date
+      const formatDate = date => {
+        return new Date(date).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+      };
+      // Submit review
+      const submitReview = async () => {
+        submitting.value = true;
+        try {
+          // Simulate API call
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          reviews.value.unshift({ ...newReview.value });
+          newReview.value = {
+            rating: 5,
+            title: '',
+            content: '',
+            name: '',
+            email: '',
+            date: null,
+            helpful: 0,
+          };
+          submitting.value = false;
+          showReviewForm.value = false;
+          showToast('Review submitted successfully!', 'success');
+        } catch (error) {
+          submitting.value = false;
+          showToast('Failed to submit review. Please try again.', 'danger');
+        }
+      };
+      // Mark review as helpful
+      const markHelpful = index => {
+        reviews.value[index].helpful++;
+      };
+      return {
+        loading,
+        reviews,
+        showReviewForm,
+        submitting,
+        newReview,
+        averageRating,
+        getRatingCount,
+        getRatingPercentage,
+        formatDate,
+        markHelpful,
+        submitReview,
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-.rating-bar {
-  .rating-label {
-    width: 60px;
+  .rating-bar {
+    .rating-label {
+      width: 60px;
+    }
+
+    .rating-count {
+      width: 30px;
+      text-align: right;
+    }
   }
 
-  .rating-count {
-    width: 30px;
-    text-align: right;
+  .review-item {
+    &:last-child {
+      border-bottom: none !important;
+    }
   }
-}
-
-.review-item {
-  &:last-child {
-    border-bottom: none !important;
-  }
-}
 </style>

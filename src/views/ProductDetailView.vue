@@ -34,11 +34,11 @@
 
       <div v-else class="row">
         <!-- Product Images -->
-        <div class="col-md-6 mb-4 mb-md-0">
+        <div class="col-md-6 mb-4 mb-md-0 d-flex">
           <div class="product-images">
             <div class="main-image-container mb-3">
               <img
-                :src="currentImage"
+                :src="product.images[0]"
                 :alt="product.name"
                 class="img-fluid main-image rounded"
               />
@@ -49,26 +49,11 @@
                 New
               </div>
             </div>
-            <div class="thumbnail-container d-flex">
-              <div
-                v-for="(image, index) in product.images"
-                :key="index"
-                class="thumbnail-item me-2"
-                :class="{ active: currentImage === image }"
-                @click="currentImage = image"
-              >
-                <img
-                  :src="image"
-                  :alt="`${product.name} thumbnail ${index + 1}`"
-                  class="img-fluid thumbnail"
-                />
-              </div>
-            </div>
           </div>
         </div>
 
         <!-- Product Info -->
-        <div class="col-md-6">
+        <div class="col-md-6 d-flex">
           <div class="product-info">
             <h1 class="product-title mb-2">{{ product.name }}</h1>
 
@@ -325,369 +310,328 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from "vue";
-import { useStore } from "vuex";
-import { useRoute } from "vue-router";
-import ProductCard from "@/components/products/ProductCard.vue";
+  import { ref, computed, onMounted, watch } from 'vue';
+  import { useStore } from 'vuex';
+  import { useRoute } from 'vue-router';
+  import ProductCard from '@/components/products/ProductCard.vue';
 
-export default {
-  name: "ProductDetailView",
-  components: {
-    ProductCard,
-  },
-  setup() {
-    const store = useStore();
-    const route = useRoute();
+  export default {
+    name: 'ProductDetailView',
+    components: {
+      ProductCard,
+    },
+    setup() {
+      const store = useStore();
+      const route = useRoute();
 
-    const loading = ref(true);
-    const quantity = ref(1);
-    const selectedVariant = ref(null);
-    const currentImage = ref("");
+      const loading = ref(true);
+      const quantity = ref(1);
+      const selectedVariant = ref(null);
+      const currentImage = ref('');
 
-    // Get product ID from route params
-    const productId = computed(() => {
-      return parseInt(route.params.id);
-    });
-
-    // Get product from store
-    const product = computed(() => {
-      const foundProduct = store.getters.productById(productId.value);
-      return foundProduct || {};
-    });
-
-    // Set current image when product changes
-    watch(product, (newProduct) => {
-      if (newProduct && newProduct.images && newProduct.images.length > 0) {
-        currentImage.value = newProduct.images[0];
-      }
-    });
-
-    // Get category name and slug
-    const categoryName = computed(() => {
-      if (!product.value.categoryId) return "";
-      const category = store.state.categories.find(
-        (cat) => cat.id === product.value.categoryId
-      );
-      return category ? category.name : "";
-    });
-
-    const categorySlug = computed(() => {
-      if (!product.value.categoryId) return "";
-      const category = store.state.categories.find(
-        (cat) => cat.id === product.value.categoryId
-      );
-      return category ? category.slug : "";
-    });
-
-    // Check if product is in wishlist
-    const isInWishlist = computed(() => {
-      return store.getters.isInWishlist(productId.value);
-    });
-
-    // Get related products (same category, excluding current product)
-    const relatedProducts = computed(() => {
-      if (!product.value.categoryId) return [];
-      return store.state.products
-        .filter(
-          (p) =>
-            p.categoryId === product.value.categoryId &&
-            p.id !== productId.value
-        )
-        .slice(0, 4);
-    });
-
-    // Initialize store and load product
-    onMounted(() => {
-      loading.value = true;
-      store.dispatch("initializeStore").then(() => {
-        loading.value = false;
+      // Get product ID from route params
+      const productId = computed(() => {
+        return parseInt(route.params.id);
       });
-    });
 
-    // Calculate discount percentage
-    const calculateDiscount = (originalPrice, salePrice) => {
-      return Math.round(((originalPrice - salePrice) / originalPrice) * 100);
-    };
-
-    // Format specification key
-    const formatSpecKey = (key) => {
-      return key
-        .split("_")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ");
-    };
-
-    // Increment quantity
-    const incrementQuantity = () => {
-      if (quantity.value < 99) {
-        quantity.value++;
-      }
-    };
-
-    // Decrement quantity
-    const decrementQuantity = () => {
-      if (quantity.value > 1) {
-        quantity.value--;
-      }
-    };
-
-    // Add to cart
-    const addToCart = () => {
-      store.dispatch("addToCart", {
-        productId: productId.value,
-        quantity: quantity.value,
-        variantId: selectedVariant.value,
+      // Get product from store
+      const product = computed(() => {
+        const foundProduct = store.getters.productById(productId.value);
+        if (foundProduct && foundProduct.images && foundProduct.images.length > 0) {
+          currentImage.value = foundProduct.images[0];
+        }
+        return foundProduct || {};
       });
-    };
 
-    // Toggle wishlist
-    const toggleWishlist = () => {
-      store.dispatch("toggleWishlist", productId.value);
-    };
+      // Get category name and slug
+      const categoryName = computed(() => {
+        if (!product.value.categoryId) return '';
+        const category = store.state.categories.find(
+          cat => cat.id === product.value.categoryId
+        );
+        return category ? category.name : '';
+      });
 
-    return {
-      loading,
-      product,
-      quantity,
-      selectedVariant,
-      currentImage,
-      categoryName,
-      categorySlug,
-      isInWishlist,
-      relatedProducts,
-      calculateDiscount,
-      formatSpecKey,
-      incrementQuantity,
-      decrementQuantity,
-      addToCart,
-      toggleWishlist,
-    };
-  },
-};
+      const categorySlug = computed(() => {
+        if (!product.value.categoryId) return '';
+        const category = store.state.categories.find(
+          cat => cat.id === product.value.categoryId
+        );
+        return category ? category.slug : '';
+      });
+
+      // Check if product is in wishlist
+      const isInWishlist = computed(() => {
+        return store.getters.isInWishlist(productId.value);
+      });
+
+      // Get related products (same category, excluding current product)
+      const relatedProducts = computed(() => {
+        if (!product.value.categoryId) return [];
+        return store.state.products
+          .filter(
+            p =>
+              p.categoryId === product.value.categoryId &&
+              p.id !== productId.value
+          )
+          .slice(0, 4);
+      });
+
+      // Initialize store and load product
+      onMounted(() => {
+        loading.value = true;
+        store.dispatch('initializeStore').then(() => {
+          loading.value = false;
+        });
+      });
+
+      // Calculate discount percentage
+      const calculateDiscount = (originalPrice, salePrice) => {
+        return Math.round(((originalPrice - salePrice) / originalPrice) * 100);
+      };
+
+      // Format specification key
+      const formatSpecKey = key => {
+        return key
+          .split('_')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+      };
+
+      // Increment quantity
+      const incrementQuantity = () => {
+        if (quantity.value < 99) {
+          quantity.value++;
+        }
+      };
+
+      // Decrement quantity
+      const decrementQuantity = () => {
+        if (quantity.value > 1) {
+          quantity.value--;
+        }
+      };
+
+      // Add to cart
+      const addToCart = () => {
+        store.dispatch('addToCart', {
+          productId: productId.value,
+          quantity: quantity.value,
+          variantId: selectedVariant.value,
+        });
+      };
+
+      // Toggle wishlist
+      const toggleWishlist = () => {
+        store.dispatch('toggleWishlist', productId.value);
+      };
+
+      return {
+        loading,
+        product,
+        quantity,
+        selectedVariant,
+        currentImage,
+        categoryName,
+        categorySlug,
+        isInWishlist,
+        relatedProducts,
+        calculateDiscount,
+        formatSpecKey,
+        incrementQuantity,
+        decrementQuantity,
+        addToCart,
+        toggleWishlist,
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-.product-images {
-  position: relative;
-}
-
-.main-image-container {
-  position: relative;
-  overflow: hidden;
-  border-radius: 0.5rem;
-
-  .main-image {
-    width: 100%;
-    height: auto;
-    transition: transform 0.5s ease;
-
-    &:hover {
-      transform: scale(1.05);
-    }
-  }
-}
-
-.product-badge {
-  position: absolute;
-  top: 15px;
-  padding: 5px 10px;
-  border-radius: 3px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  z-index: 2;
-
-  &.sale-badge {
-    left: 15px;
-    background-color: #e3342f;
-    color: white;
+  .product-images {
+    position: relative;
   }
 
-  &.new-badge {
-    right: 15px;
-    background-color: #3490dc;
-    color: white;
-  }
-}
+  .main-image-container {
+    position: relative;
+    height: 400px;
+    border-radius: 0.5rem;
 
-.thumbnail-container {
-  overflow-x: auto;
-  padding-bottom: 5px;
+    .main-image {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+      transition: transform 0.5s ease;
 
-  &::-webkit-scrollbar {
-    height: 5px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 10px;
-  }
-}
-
-.thumbnail-item {
-  width: 80px;
-  height: 80px;
-  border-radius: 0.25rem;
-  overflow: hidden;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: all 0.3s ease;
-
-  &.active {
-    border-color: var(--bs-primary);
-  }
-
-  .thumbnail {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
-.product-title {
-  font-weight: 600;
-  font-size: 1.75rem;
-}
-
-.sale-price {
-  color: #e3342f;
-  font-weight: 600;
-  font-size: 1.5rem;
-}
-
-.product-price {
-  font-size: 1.5rem;
-}
-
-.variant-btn {
-  min-width: 40px;
-
-  &.active {
-    background-color: #343a40;
-    color: white;
-  }
-}
-
-.quantity-selector {
-  max-width: 150px;
-
-  input[type="number"] {
-    -moz-appearance: textfield;
-
-    &::-webkit-outer-spin-button,
-    &::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-  }
-}
-
-.wishlist-btn {
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &.active {
-    color: #e3342f;
-    border-color: #e3342f;
-
-    i {
-      color: #e3342f;
-    }
-  }
-}
-
-.product-tag {
-  color: #6c757d;
-}
-
-.social-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: #f8f9fa;
-  color: #495057;
-  text-decoration: none;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background-color: #e9ecef;
-    color: #212529;
-    transform: translateY(-2px);
-  }
-
-  i {
-    font-size: 1rem;
-  }
-
-  &:first-of-type:hover {
-    background-color: #3b5998;
-    color: white;
-  }
-
-  &:nth-of-type(2):hover {
-    background-color: #000000;
-    color: white;
-  }
-
-  &:nth-of-type(3):hover {
-    background-color: #e60023;
-    color: white;
-  }
-
-  &:nth-of-type(4):hover {
-    background: linear-gradient(
-      45deg,
-      #405de6,
-      #5851db,
-      #833ab4,
-      #c13584,
-      #e1306c,
-      #fd1d1d
-    );
-    color: white;
-  }
-}
-
-.product-tabs {
-  .nav-tabs {
-    border-bottom: none;
-
-    .nav-link {
-      border: none;
-      font-weight: 600;
-      padding: 1rem 1.5rem;
-      color: #6c757d;
-
-      &.active {
-        color: #343a40;
-        border-bottom: 2px solid var(--bs-primary);
+      &:hover {
+        transform: scale(1.05);
       }
     }
   }
 
-  .tab-content {
-    border-radius: 0 0 0.5rem 0.5rem;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-  }
-}
+  .product-badge {
+    position: absolute;
+    top: 15px;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    z-index: 2;
 
-@media (max-width: 768px) {
-  .product-tabs {
-    .nav-link {
-      padding: 0.75rem 1rem;
-      font-size: 0.9rem;
+    &.sale-badge {
+      left: 15px;
+      background-color: #e3342f;
+      color: white;
+    }
+
+    &.new-badge {
+      right: 15px;
+      background-color: #3490dc;
+      color: white;
     }
   }
-}
+
+
+  .product-title {
+    font-weight: 600;
+    font-size: 1.75rem;
+  }
+
+  .sale-price {
+    color: #e3342f;
+    font-weight: 600;
+    font-size: 1.5rem;
+  }
+
+  .product-price {
+    font-size: 1.5rem;
+  }
+
+  .variant-btn {
+    min-width: 40px;
+
+    &.active {
+      background-color: #343a40;
+      color: white;
+    }
+  }
+
+  .quantity-selector {
+    max-width: 150px;
+
+    input[type='number'] {
+      -moz-appearance: textfield;
+
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+    }
+  }
+
+  .wishlist-btn {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.active {
+      color: #e3342f;
+      border-color: #e3342f;
+
+      i {
+        color: #e3342f;
+      }
+    }
+  }
+
+  .product-tag {
+    color: #6c757d;
+  }
+
+  .social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #f8f9fa;
+    color: #495057;
+    text-decoration: none;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #e9ecef;
+      color: #212529;
+      transform: translateY(-2px);
+    }
+
+    i {
+      font-size: 1rem;
+    }
+
+    &:first-of-type:hover {
+      background-color: #3b5998;
+      color: white;
+    }
+
+    &:nth-of-type(2):hover {
+      background-color: #000000;
+      color: white;
+    }
+
+    &:nth-of-type(3):hover {
+      background-color: #e60023;
+      color: white;
+    }
+
+    &:nth-of-type(4):hover {
+      background: linear-gradient(
+        45deg,
+        #405de6,
+        #5851db,
+        #833ab4,
+        #c13584,
+        #e1306c,
+        #fd1d1d
+      );
+      color: white;
+    }
+  }
+
+  .product-tabs {
+    .nav-tabs {
+      border-bottom: none;
+
+      .nav-link {
+        border: none;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+        color: #6c757d;
+
+        &.active {
+          color: #343a40;
+          border-bottom: 2px solid var(--bs-primary);
+        }
+      }
+    }
+
+    .tab-content {
+      border-radius: 0 0 0.5rem 0.5rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .product-tabs {
+      .nav-link {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+      }
+    }
+  }
 </style>

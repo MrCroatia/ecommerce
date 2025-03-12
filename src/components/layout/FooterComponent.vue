@@ -157,30 +157,30 @@
 </template>
 
 <script>
-export default {
-  name: "FooterComponent",
-  computed: {
-    currentYear() {
-      return new Date().getFullYear();
+  export default {
+    name: 'FooterComponent',
+    computed: {
+      currentYear() {
+        return new Date().getFullYear();
+      },
     },
-  },
-};
+  };
 </script>
 
 <style lang="scss" scoped>
-footer {
-  a {
-    transition: opacity 0.3s ease;
-
-    &:hover {
-      opacity: 0.8;
-    }
-  }
-
-  .social-links {
+  footer {
     a {
-      font-size: 1.2rem;
+      transition: opacity 0.3s ease;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    .social-links {
+      a {
+        font-size: 1.2rem;
+      }
     }
   }
-}
 </style>

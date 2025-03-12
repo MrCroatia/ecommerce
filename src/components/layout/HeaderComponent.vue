@@ -135,49 +135,49 @@
 </template>
 
 <script>
-import { computed } from "vue";
-import { useStore } from "vuex";
+  import { computed } from 'vue';
+  import { useStore } from 'vuex';
 
-export default {
-  name: "HeaderComponent",
-  setup() {
-    const store = useStore();
+  export default {
+    name: 'HeaderComponent',
+    setup() {
+      const store = useStore();
 
-    const cartItemCount = computed(() => {
-      return store.getters.cartItemCount || 0;
-    });
+      const cartItemCount = computed(() => {
+        return store.getters.cartItemCount || 0;
+      });
 
-    const wishlistCount = computed(() => {
-      return store.state.wishlist.length || 0;
-    });
+      const wishlistCount = computed(() => {
+        return store.state.wishlist.length || 0;
+      });
 
-    return {
-      cartItemCount,
-      wishlistCount,
-    };
-  },
-};
+      return {
+        cartItemCount,
+        wishlistCount,
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-.navbar-brand {
-  font-weight: 700;
-}
-
-.nav-link {
-  font-weight: 500;
-  transition: color 0.3s ease;
-
-  &:hover,
-  &.active {
-    color: var(--bs-primary);
+  .navbar-brand {
+    font-weight: 700;
   }
-}
 
-.dropdown-item {
-  &:hover,
-  &:focus {
-    background-color: rgba(255, 126, 95, 0.1);
+  .nav-link {
+    font-weight: 500;
+    transition: color 0.3s ease;
+
+    &:hover,
+    &.active {
+      color: var(--bs-primary);
+    }
   }
-}
+
+  .dropdown-item {
+    &:hover,
+    &:focus {
+      background-color: rgba(255, 126, 95, 0.1);
+    }
+  }
 </style>

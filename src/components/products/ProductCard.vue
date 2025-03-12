@@ -1,14 +1,15 @@
+vue
 <template>
   <div class="product-card">
     <div class="product-badges">
-      <span v-if="product.isNew" class="badge bg-info">New</span>
-      <span v-if="product.onSale" class="badge bg-danger">Sale</span>
+      <span v-if="product?.isNew" class="badge bg-info">New</span>
+      <span v-if="product?.onSale" class="badge bg-danger">Sale</span>
     </div>
     <div class="product-img-container">
-      <router-link :to="`/product/${product.id}`">
-<img
-          :src="product.images[0]"
-          :alt="product.name"
+      <router-link :to="product?.id ? `/product/${product.id}` : '#'">
+        <img
+          :src="product?.images?.[0]"
+          :alt="product?.name"
           class="product-img img-fluid"
           loading="lazy"
         />
@@ -16,14 +17,14 @@
       <div class="product-actions">
         <button
           class="btn btn-sm btn-light"
-          @click="addToCart(product.id)"
+          @click="addToCart(product?.id)"
           title="Add to Cart"
         >
           <i class="bi bi-cart-plus"></i>
         </button>
         <button
           class="btn btn-sm btn-light"
-          @click="toggleWishlist(product.id)"
+          @click="toggleWishlist(product?.id)"
           :class="{ active: isInWishlist }"
           title="Add to Wishlist"
         >
@@ -33,7 +34,7 @@
           ></i>
         </button>
         <router-link
-          :to="`/product/${product.id}`"
+          :to="`/product/${product?.id}`"
           class="btn btn-sm btn-light"
           title="View Details"
         >
@@ -47,19 +48,20 @@
           :to="`/product/${product.id}`"
           class="text-decoration-none text-dark"
         >
-          {{ product.name }}
+          {{ product?.name }}
         </router-link>
       </h3>
       <div class="product-price mb-2">
-        <span v-if="product.salePrice" class="sale-price me-2"
-          >${{ product.salePrice.toFixed(2) }}</span
-        >
+        <span v-if="product?.salePrice" class="sale-price me-2">
+          ${{ product?.salePrice?.toFixed(2) }}
+        </span>
         <span
           :class="{
-            'text-decoration-line-through text-muted': product.salePrice,
+            'text-decoration-line-through text-muted': product?.salePrice,
           }"
-          >${{ product.price.toFixed(2) }}</span
         >
+          ${{ product?.price?.toFixed(2) }}
+        </span>
       </div>
       <div class="product-rating d-flex align-items-center mb-2">
         <div class="me-2">
@@ -68,181 +70,178 @@
             :key="i"
             class="bi"
             :class="
-              i <= Math.floor(product.rating)
+              vue
                 ? 'bi-star-fill'
-                : i - 0.5 <= product.rating
+                : i - 0.5 <= (product?.rating || 0)
                 ? 'bi-star-half'
                 : 'bi-star'
             "
             style="color: #ffc107"
           ></i>
         </div>
-        <small class="text-muted">{{ product.reviews }} reviews</small>
+        <small class="text-muted">{{ product?.reviews || 0 }} reviews</small>
       </div>
-      <button class="btn btn-summer w-100" @click="addToCart(product.id)">
+      <button class="btn btn-summer w-100" @click="addToCart(product?.id)">
         Add to Cart
       </button>
     </div>
   </div>
 </template>
 
+vue
 <script>
-import { computed } from "vue";
-import { useStore } from "vuex";
-import { showToast } from "@/utils/notifications";
-
-export default {
-  name: "ProductCard",
-  props: {
-    product: {
-      type: Object,
-      required: true,
+  import { computed } from 'vue';
+  import { useStore } from 'vuex';
+  import { showToast } from '@/utils/notifications';
+  export default {
+    name: 'ProductCard',
+    props: {
+      product: {
+        type: Object,
+        required: true,
+        default: () => ({
+          id: null,
+          name: '',
+          price: 0,
+          images: [],
+          rating: 0,
+          reviews: 0,
+          isNew: false,
+          onSale: false,
+        }),
+      },
     },
-  },
-  setup(props) {
-    const store = useStore();
-
-    const isInWishlist = computed(() => {
-      return store.getters.isInWishlist(props.product.id);
-    });
-
-    const addToCart = (productId) => {
-      store.dispatch("addToCart", { productId, quantity: 1 });
-      showToast('Product added to cart!', 'success');
-    };
-
-    const toggleWishlist = (productId) => {
-      store.dispatch("toggleWishlist", productId);
-      
-      const isCurrentlyInWishlist = store.getters.isInWishlist(productId);
-      if (isCurrentlyInWishlist) {
-        showToast('Added to wishlist!', 'info');
-      } else {
-        showToast('Removed from wishlist', 'secondary');
-      }
-    };
-
-    return {
-      isInWishlist,
-      addToCart,
-      toggleWishlist,
-    };
-  },
-};
+    setup(props) {
+      const store = useStore();
+      const isInWishlist = computed(() => {
+        return store.getters.isInWishlist(props.product.id);
+      });
+      const addToCart = productId => {
+        store.dispatch('addToCart', { productId, quantity: 1 });
+        showToast('Product added to cart!', 'success');
+      };
+      const toggleWishlist = async productId => {
+        const wasInWishlist = store.getters.isInWishlist(productId);
+        try {
+          await store.dispatch('toggleWishlist', productId);
+          showToast(
+            wasInWishlist ? 'Removed from wishlist' : 'Added to wishlist!',
+            wasInWishlist ? 'secondary' : 'info'
+          );
+        } catch (error) {
+          showToast('Failed to update wishlist', 'danger');
+        }
+      };
+      return {
+        isInWishlist,
+        addToCart,
+        toggleWishlist,
+      };
+    },
+  };
 </script>
-
+vue vue
 <style lang="scss" scoped>
-.product-card {
-  background-color: white;
-  border-radius: 0.5rem;
-  overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  animation: fadeIn 0.5s ease-in-out;
-  
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-
-    .product-actions {
-      opacity: 1;
-    }
-
-    .product-img {
-      transform: scale(1.05);
-    }
-  }
-}
-
-.product-img-container {
-  position: relative;
-  overflow: hidden;
-  padding-top: 100%; // 1:1 Aspect ratio
-}
-
-.product-img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.product-badges {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 2;
-
-  .badge {
-    display: block;
-    margin-bottom: 5px;
-  }
-}
-
-.product-actions {
-  position: absolute;
-  bottom: 10px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 2;
-
-  .btn {
-    width: 35px;
-    height: 35px;
+  .product-card {
+    background-color: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-
-    &.active {
-      color: #e3342f;
+    flex-direction: column;
+    animation: fadeIn 0.5s ease-in-out;
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-  }
-}
-
-.product-info {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.product-title {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  line-height: 1.3;
-
-  a {
-    color: inherit;
-
     &:hover {
-      color: var(--bs-primary);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      .product-actions {
+        opacity: 1;
+      }
+      .product-img {
+        transform: scale(1.05);
+      }
     }
   }
-}
-
-.sale-price {
-  color: #e3342f;
-  font-weight: 600;
-}
-
-.btn-summer {
-  margin-top: auto;
-}
+  .product-img-container {
+    position: relative;
+    overflow: hidden;
+    padding-top: 100%; // 1:1 Aspect ratio
+  }
+  .product-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .product-badges {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+    .badge {
+      display: block;
+      margin-bottom: 5px;
+    }
+  }
+  .product-actions {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 2;
+    .btn {
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      &.active {
+        color: #e3342f;
+      }
+    }
+  }
+  .product-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .product-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+    a {
+      color: inherit;
+      &:hover {
+        color: var(--bs-primary);
+      }
+    }
+  }
+  .sale-price {
+    color: #e3342f;
+    font-weight: 600;
+  }
+  .btn-summer {
+    margin-top: auto;
+  }
 </style>

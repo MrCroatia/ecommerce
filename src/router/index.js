@@ -1,75 +1,75 @@
-import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
+import { createRouter, createWebHistory } from 'vue-router';
+import HomeView from '../views/HomeView.vue';
 
 const routes = [
   {
-    path: "/",
-    name: "home",
+    path: '/',
+    name: 'home',
     component: HomeView,
   },
   {
-    path: "/about",
-    name: "about",
+    path: '/about',
+    name: 'about',
     component: () =>
-      import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
+      import(/* webpackChunkName: "about" */ '../views/AboutView.vue'),
   },
   {
-    path: "/products",
-    name: "products",
+    path: '/products',
+    name: 'products',
     component: () =>
-      import(/* webpackChunkName: "products" */ "../views/ProductsView.vue"),
+      import(/* webpackChunkName: "products" */ '../views/ProductsView.vue'),
   },
   {
-    path: "/product/:id",
-    name: "product-detail",
+    path: '/product/:id',
+    name: 'product-detail',
     component: () =>
       import(
-        /* webpackChunkName: "product-detail" */ "../views/ProductDetailView.vue"
+        /* webpackChunkName: "product-detail" */ '../views/ProductDetailView.vue'
       ),
     props: true,
   },
   {
-    path: "/category/:category",
-    name: "category",
+    path: '/category/:category',
+    name: 'category',
     component: () =>
-      import(/* webpackChunkName: "category" */ "../views/CategoryView.vue"),
+      import(/* webpackChunkName: "category" */ '../views/CategoryView.vue'),
     props: true,
   },
   {
-    path: "/cart",
-    name: "cart",
+    path: '/cart',
+    name: 'cart',
     component: () =>
-      import(/* webpackChunkName: "cart" */ "../views/CartView.vue"),
+      import(/* webpackChunkName: "cart" */ '../views/CartView.vue'),
   },
   {
-    path: "/checkout",
-    name: "checkout",
+    path: '/checkout',
+    name: 'checkout',
     component: () =>
-      import(/* webpackChunkName: "checkout" */ "../views/CheckoutView.vue"),
+      import(/* webpackChunkName: "checkout" */ '../views/CheckoutView.vue'),
   },
   {
-    path: "/contact",
-    name: "contact",
+    path: '/contact',
+    name: 'contact',
     component: () =>
-      import(/* webpackChunkName: "contact" */ "../views/ContactView.vue"),
+      import(/* webpackChunkName: "contact" */ '../views/ContactView.vue'),
   },
   {
-    path: "/account",
-    name: "account",
+    path: '/account',
+    name: 'account',
     component: () =>
-      import(/* webpackChunkName: "account" */ "../views/AccountView.vue"),
+      import(/* webpackChunkName: "account" */ '../views/AccountView.vue'),
   },
   {
-    path: "/wishlist",
-    name: "wishlist",
+    path: '/wishlist',
+    name: 'wishlist',
     component: () =>
-      import(/* webpackChunkName: "wishlist" */ "../views/WishlistView.vue"),
+      import(/* webpackChunkName: "wishlist" */ '../views/WishlistView.vue'),
   },
   {
-    path: "/:pathMatch(.*)*",
-    name: "not-found",
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
     component: () =>
-      import(/* webpackChunkName: "not-found" */ "../views/NotFoundView.vue"),
+      import(/* webpackChunkName: "not-found" */ '../views/NotFoundView.vue'),
   },
 ];
 

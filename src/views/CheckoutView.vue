@@ -235,7 +235,7 @@
                       for="standardShipping"
                     >
                       <span>Standard Shipping (3-5 business days)</span>
-                      <span>{{ cartSubtotal >= 50 ? "Free" : "$5.99" }}</span>
+                      <span>{{ cartSubtotal >= 50 ? 'Free' : '$5.99' }}</span>
                     </label>
                   </div>
                   <div class="form-check mb-2">
@@ -687,7 +687,7 @@
             <div class="d-flex justify-content-between mb-2">
               <span>Shipping</span>
               <span>{{
-                shippingCost > 0 ? "$" + shippingCost.toFixed(2) : "Free"
+                shippingCost > 0 ? '$' + shippingCost.toFixed(2) : 'Free'
               }}</span>
             </div>
 
@@ -718,265 +718,266 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from "vue";
-import { useStore } from "vuex";
-import { useRouter } from "vue-router";
+  import { ref, computed, onMounted, watch } from 'vue';
+  import { useStore } from 'vuex';
+  import { useRouter } from 'vue-router';
 
-export default {
-  name: "CheckoutView",
-  setup() {
-    const store = useStore();
-    const router = useRouter();
-    const loading = ref(true);
-    const currentStep = ref(1);
-    const discount = ref(0);
-    const tax = ref(0);
-    const orderNumber = ref("");
+  export default {
+    name: 'CheckoutView',
+    setup() {
+      const store = useStore();
+      const router = useRouter();
+      const loading = ref(true);
+      const currentStep = ref(1);
+      const discount = ref(0);
+      const tax = ref(0);
+      const orderNumber = ref('');
 
-    // Shipping information
-    const shippingInfo = ref({
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-      address: "",
-      addressLine2: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      country: "",
-      saveInfo: false,
-      shippingMethod: "standard",
-    });
+      // Shipping information
+      const shippingInfo = ref({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        address: '',
+        addressLine2: '',
+        city: '',
+        state: '',
+        zipCode: '',
+        country: '',
+        saveInfo: false,
+        shippingMethod: 'standard',
+      });
 
-    // Payment information
-    const paymentInfo = ref({
-      method: "creditCard",
-      cardName: "",
-      cardNumber: "",
-      expiryDate: "",
-      cvv: "",
-      savePayment: false,
-      sameAsShipping: true,
-      billingFirstName: "",
-      billingLastName: "",
-      billingAddress: "",
-      billingCity: "",
-      billingState: "",
-      billingZipCode: "",
-      billingCountry: "",
-    });
+      // Payment information
+      const paymentInfo = ref({
+        method: 'creditCard',
+        cardName: '',
+        cardNumber: '',
+        expiryDate: '',
+        cvv: '',
+        savePayment: false,
+        sameAsShipping: true,
+        billingFirstName: '',
+        billingLastName: '',
+        billingAddress: '',
+        billingCity: '',
+        billingState: '',
+        billingZipCode: '',
+        billingCountry: '',
+      });
 
-    // Initialize store and load cart
-    onMounted(() => {
-      loading.value = true;
-      store.dispatch("initializeStore").then(() => {
-        loading.value = false;
+      // Initialize store and load cart
+      onMounted(() => {
+        loading.value = true;
+        store.dispatch('initializeStore').then(() => {
+          loading.value = false;
 
-        // Calculate tax
-        calculateTax();
+          // Calculate tax
+          calculateTax();
 
-        // Redirect to cart if cart is empty
-        if (cartItems.value.length === 0) {
-          router.push("/cart");
+          // Redirect to cart if cart is empty
+          if (cartItems.value.length === 0) {
+            router.push('/cart');
+          }
+        });
+      });
+
+      // Get cart items from store
+      const cartItems = computed(() => {
+        return store.getters.cartWithProducts;
+      });
+
+      // Calculate cart subtotal
+      const cartSubtotal = computed(() => {
+        return cartItems.value.reduce((total, item) => {
+          const price = item.product.salePrice || item.product.price;
+          return total + price * item.quantity;
+        }, 0);
+      });
+
+      // Calculate shipping cost based on method
+      const shippingCost = computed(() => {
+        if (shippingInfo.value.shippingMethod === 'standard') {
+          return cartSubtotal.value >= 50 ? 0 : 5.99;
+        } else {
+          return 12.99;
         }
       });
-    });
 
-    // Get cart items from store
-    const cartItems = computed(() => {
-      return store.getters.cartWithProducts;
-    });
+      // Calculate order total
+      const orderTotal = computed(() => {
+        return (
+          cartSubtotal.value + shippingCost.value + tax.value - discount.value
+        );
+      });
 
-    // Calculate cart subtotal
-    const cartSubtotal = computed(() => {
-      return cartItems.value.reduce((total, item) => {
-        const price = item.product.salePrice || item.product.price;
-        return total + price * item.quantity;
-      }, 0);
-    });
-
-    // Calculate shipping cost based on method
-    const shippingCost = computed(() => {
-      if (shippingInfo.value.shippingMethod === "standard") {
-        return cartSubtotal.value >= 50 ? 0 : 5.99;
-      } else {
-        return 12.99;
-      }
-    });
-
-    // Calculate order total
-    const orderTotal = computed(() => {
-      return (
-        cartSubtotal.value + shippingCost.value + tax.value - discount.value
-      );
-    });
-
-    // Calculate tax (simplified as 8.25% of subtotal)
-    const calculateTax = () => {
-      tax.value = cartSubtotal.value * 0.0825;
-    };
-
-    // Calculate total for a specific item
-    const calculateItemTotal = (item) => {
-      const price = item.product.salePrice || item.product.price;
-      return price * item.quantity;
-    };
-
-    // Get country name from country code
-    const getCountryName = (countryCode) => {
-      const countries = {
-        US: "United States",
-        CA: "Canada",
-        UK: "United Kingdom",
-        AU: "Australia",
-        DE: "Germany",
-        FR: "France",
+      // Calculate tax (simplified as 8.25% of subtotal)
+      const calculateTax = () => {
+        tax.value = cartSubtotal.value * 0.0825;
       };
-      return countries[countryCode] || countryCode;
-    };
 
-    // Navigate to step
-    const goToStep = (step) => {
-      currentStep.value = step;
-      window.scrollTo(0, 0);
-    };
+      // Calculate total for a specific item
+      const calculateItemTotal = item => {
+        const price = item.product.salePrice || item.product.price;
+        return price * item.quantity;
+      };
 
-    // Place order
-    const placeOrder = () => {
-      // Generate random order number
-      orderNumber.value = "ORD-" + Math.floor(100000 + Math.random() * 900000);
+      // Get country name from country code
+      const getCountryName = countryCode => {
+        const countries = {
+          US: 'United States',
+          CA: 'Canada',
+          UK: 'United Kingdom',
+          AU: 'Australia',
+          DE: 'Germany',
+          FR: 'France',
+        };
+        return countries[countryCode] || countryCode;
+      };
 
-      // Clear cart
-      store.dispatch("clearCart");
+      // Navigate to step
+      const goToStep = step => {
+        currentStep.value = step;
+        window.scrollTo(0, 0);
+      };
 
-      // Show confirmation
-      currentStep.value = 4;
-      window.scrollTo(0, 0);
-    };
+      // Place order
+      const placeOrder = () => {
+        // Generate random order number
+        orderNumber.value =
+          'ORD-' + Math.floor(100000 + Math.random() * 900000);
 
-    // Update tax when subtotal or shipping method changes
-    watch([cartSubtotal, () => shippingInfo.value.shippingMethod], () => {
-      calculateTax();
-    });
+        // Clear cart
+        store.dispatch('clearCart');
 
-    // Copy shipping info to billing info when sameAsShipping changes
-    watch(
-      () => paymentInfo.value.sameAsShipping,
-      (newValue) => {
-        if (newValue) {
-          // Billing address same as shipping address
-          paymentInfo.value.billingFirstName = shippingInfo.value.firstName;
-          paymentInfo.value.billingLastName = shippingInfo.value.lastName;
-          paymentInfo.value.billingAddress = shippingInfo.value.address;
-          paymentInfo.value.billingCity = shippingInfo.value.city;
-          paymentInfo.value.billingState = shippingInfo.value.state;
-          paymentInfo.value.billingZipCode = shippingInfo.value.zipCode;
-          paymentInfo.value.billingCountry = shippingInfo.value.country;
+        // Show confirmation
+        currentStep.value = 4;
+        window.scrollTo(0, 0);
+      };
+
+      // Update tax when subtotal or shipping method changes
+      watch([cartSubtotal, () => shippingInfo.value.shippingMethod], () => {
+        calculateTax();
+      });
+
+      // Copy shipping info to billing info when sameAsShipping changes
+      watch(
+        () => paymentInfo.value.sameAsShipping,
+        newValue => {
+          if (newValue) {
+            // Billing address same as shipping address
+            paymentInfo.value.billingFirstName = shippingInfo.value.firstName;
+            paymentInfo.value.billingLastName = shippingInfo.value.lastName;
+            paymentInfo.value.billingAddress = shippingInfo.value.address;
+            paymentInfo.value.billingCity = shippingInfo.value.city;
+            paymentInfo.value.billingState = shippingInfo.value.state;
+            paymentInfo.value.billingZipCode = shippingInfo.value.zipCode;
+            paymentInfo.value.billingCountry = shippingInfo.value.country;
+          }
         }
-      }
-    );
+      );
 
-    return {
-      loading,
-      currentStep,
-      shippingInfo,
-      paymentInfo,
-      cartItems,
-      cartSubtotal,
-      shippingCost,
-      discount,
-      tax,
-      orderTotal,
-      orderNumber,
-      calculateItemTotal,
-      getCountryName,
-      goToStep,
-      placeOrder,
-    };
-  },
-};
+      return {
+        loading,
+        currentStep,
+        shippingInfo,
+        paymentInfo,
+        cartItems,
+        cartSubtotal,
+        shippingCost,
+        discount,
+        tax,
+        orderTotal,
+        orderNumber,
+        calculateItemTotal,
+        getCountryName,
+        goToStep,
+        placeOrder,
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-.checkout-progress {
-  .step-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 33.333%;
-    position: relative;
-
-    .step-circle {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background-color: #e9ecef;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      transition: all 0.3s ease;
-    }
-
-    .step-label {
-      font-size: 0.875rem;
-      color: #6c757d;
-      transition: all 0.3s ease;
-    }
-
-    &.active {
-      .step-circle {
-        background-color: var(--bs-primary);
-        color: white;
-      }
-
-      .step-label {
-        color: #343a40;
-        font-weight: 600;
-      }
-    }
-
-    &.completed {
-      .step-circle {
-        background-color: #28a745;
-        color: white;
-      }
-    }
-  }
-}
-
-.order-item-img {
-  width: 60px;
-  height: 60px;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
-.confirmation-icon {
-  i {
-    opacity: 0.9;
-  }
-}
-
-@media (max-width: 768px) {
   .checkout-progress {
     .step-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 33.333%;
+      position: relative;
+
       .step-circle {
-        width: 25px;
-        height: 25px;
-        font-size: 0.875rem;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
       }
 
       .step-label {
-        font-size: 0.75rem;
+        font-size: 0.875rem;
+        color: #6c757d;
+        transition: all 0.3s ease;
+      }
+
+      &.active {
+        .step-circle {
+          background-color: var(--bs-primary);
+          color: white;
+        }
+
+        .step-label {
+          color: #343a40;
+          font-weight: 600;
+        }
+      }
+
+      &.completed {
+        .step-circle {
+          background-color: #28a745;
+          color: white;
+        }
       }
     }
   }
-}
+
+  .order-item-img {
+    width: 60px;
+    height: 60px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .confirmation-icon {
+    i {
+      opacity: 0.9;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .checkout-progress {
+      .step-item {
+        .step-circle {
+          width: 25px;
+          height: 25px;
+          font-size: 0.875rem;
+        }
+
+        .step-label {
+          font-size: 0.75rem;
+        }
+      }
+    }
+  }
 </style>

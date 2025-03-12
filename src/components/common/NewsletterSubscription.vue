@@ -64,53 +64,58 @@
   </div>
 </template>
 
+vue
 <script>
-import { ref } from "vue";
-
-export default {
-  name: "NewsletterSubscription",
-  setup() {
-    const email = ref("");
-    const agreeToPolicy = ref(false);
-    const subscribing = ref(false);
-    const subscribed = ref(false);
-
-    const subscribe = () => {
-      subscribing.value = true;
-
-      // Simulate API call
-      setTimeout(() => {
-        subscribing.value = false;
-        subscribed.value = true;
-        email.value = "";
-        agreeToPolicy.value = false;
-
-        // Hide success message after 5 seconds
-        setTimeout(() => {
-          subscribed.value = false;
-        }, 5000);
-      }, 1500);
-    };
-
-    return {
-      email,
-      agreeToPolicy,
-      subscribing,
-      subscribed,
-      subscribe,
-    };
-  },
-};
+  import { ref } from 'vue';
+  import { showToast } from '@/utils/notifications';
+  export default {
+    name: 'NewsletterSubscription',
+    setup() {
+      const email = ref('');
+      const agreeToPolicy = ref(false);
+      const subscribing = ref(false);
+      const subscribed = ref(false);
+      const subscribe = async () => {
+        if (!email.value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+          showToast('Please enter a valid email address', 'danger');
+          return;
+        }
+        subscribing.value = true;
+        try {
+          // Simulate API call
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          subscribing.value = false;
+          subscribed.value = true;
+          email.value = '';
+          agreeToPolicy.value = false;
+          // Hide success message after 5 seconds
+          setTimeout(() => {
+            subscribed.value = false;
+          }, 5000);
+        } catch (error) {
+          subscribing.value = false;
+          showToast('Failed to subscribe. Please try again.', 'danger');
+        }
+      };
+      return {
+        email,
+        agreeToPolicy,
+        subscribing,
+        subscribed,
+        subscribe,
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-.newsletter-subscription {
-  border-top: 1px solid #dee2e6;
-  border-bottom: 1px solid #dee2e6;
-}
+  .newsletter-subscription {
+    border-top: 1px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
+  }
 
-.newsletter-form {
-  max-width: 600px;
-  margin: 0 auto;
-}
+  .newsletter-form {
+    max-width: 600px;
+    margin: 0 auto;
+  }
 </style>

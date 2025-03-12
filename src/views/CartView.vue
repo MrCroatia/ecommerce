@@ -151,7 +151,7 @@
             <div class="d-flex justify-content-between mb-2">
               <span>Shipping</span>
               <span>{{
-                shipping > 0 ? "$" + shipping.toFixed(2) : "Free"
+                shipping > 0 ? '$' + shipping.toFixed(2) : 'Free'
               }}</span>
             </div>
 
@@ -196,200 +196,200 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from "vue";
-import { useStore } from "vuex";
+  import { ref, computed, onMounted } from 'vue';
+  import { useStore } from 'vuex';
 
-export default {
-  name: "CartView",
-  setup() {
-    const store = useStore();
-    const loading = ref(true);
-    const shipping = ref(0);
-    const discount = ref(0);
+  export default {
+    name: 'CartView',
+    setup() {
+      const store = useStore();
+      const loading = ref(true);
+      const shipping = ref(0);
+      const discount = ref(0);
 
-    // Initialize store and load cart
-    onMounted(() => {
-      loading.value = true;
-      store.dispatch("initializeStore").then(() => {
-        loading.value = false;
+      // Initialize store and load cart
+      onMounted(() => {
+        loading.value = true;
+        store.dispatch('initializeStore').then(() => {
+          loading.value = false;
 
-        // Calculate shipping based on cart total
-        calculateShipping();
-      });
-    });
-
-    // Get cart items from store
-    const cartItems = computed(() => {
-      return store.getters.cartWithProducts;
-    });
-
-    // Calculate cart subtotal
-    const cartSubtotal = computed(() => {
-      return cartItems.value.reduce((total, item) => {
-        const price = item.product.salePrice || item.product.price;
-        return total + price * item.quantity;
-      }, 0);
-    });
-
-    // Calculate cart total
-    const cartTotal = computed(() => {
-      return cartSubtotal.value + shipping.value - discount.value;
-    });
-
-    // Calculate shipping based on cart subtotal
-    const calculateShipping = () => {
-      if (cartSubtotal.value >= 50) {
-        shipping.value = 0; // Free shipping for orders over $50
-      } else if (cartSubtotal.value > 0) {
-        shipping.value = 5.99;
-      } else {
-        shipping.value = 0;
-      }
-    };
-
-    // Calculate total for a specific item
-    const calculateItemTotal = (item) => {
-      const price = item.product.salePrice || item.product.price;
-      return price * item.quantity;
-    };
-
-    // Remove item from cart
-    const removeFromCart = (itemId) => {
-      store.dispatch("removeFromCart", itemId).then(() => {
-        calculateShipping();
-      });
-    };
-
-    // Update item quantity
-    const updateQuantity = (itemId, quantity) => {
-      const qty = parseInt(quantity);
-      if (qty >= 1 && qty <= 99) {
-        store
-          .dispatch("updateCartItemQuantity", { itemId, quantity: qty })
-          .then(() => {
-            calculateShipping();
-          });
-      }
-    };
-
-    // Increment item quantity
-    const incrementQuantity = (itemId) => {
-      const item = cartItems.value.find((item) => item.id === itemId);
-      if (item && item.quantity < 99) {
-        updateQuantity(itemId, item.quantity + 1);
-      }
-    };
-
-    // Decrement item quantity
-    const decrementQuantity = (itemId) => {
-      const item = cartItems.value.find((item) => item.id === itemId);
-      if (item && item.quantity > 1) {
-        updateQuantity(itemId, item.quantity - 1);
-      }
-    };
-
-    // Clear cart
-    const clearCart = () => {
-      if (confirm("Are you sure you want to clear your cart?")) {
-        store.dispatch("clearCart").then(() => {
+          // Calculate shipping based on cart total
           calculateShipping();
         });
-      }
-    };
+      });
 
-    return {
-      loading,
-      cartItems,
-      cartSubtotal,
-      cartTotal,
-      shipping,
-      discount,
-      calculateItemTotal,
-      removeFromCart,
-      updateQuantity,
-      incrementQuantity,
-      decrementQuantity,
-      clearCart,
-    };
-  },
-};
+      // Get cart items from store
+      const cartItems = computed(() => {
+        return store.getters.cartWithProducts;
+      });
+
+      // Calculate cart subtotal
+      const cartSubtotal = computed(() => {
+        return cartItems.value.reduce((total, item) => {
+          const price = item.product.salePrice || item.product.price;
+          return total + price * item.quantity;
+        }, 0);
+      });
+
+      // Calculate cart total
+      const cartTotal = computed(() => {
+        return cartSubtotal.value + shipping.value - discount.value;
+      });
+
+      // Calculate shipping based on cart subtotal
+      const calculateShipping = () => {
+        if (cartSubtotal.value >= 50) {
+          shipping.value = 0; // Free shipping for orders over $50
+        } else if (cartSubtotal.value > 0) {
+          shipping.value = 5.99;
+        } else {
+          shipping.value = 0;
+        }
+      };
+
+      // Calculate total for a specific item
+      const calculateItemTotal = item => {
+        const price = item.product.salePrice || item.product.price;
+        return price * item.quantity;
+      };
+
+      // Remove item from cart
+      const removeFromCart = itemId => {
+        store.dispatch('removeFromCart', itemId).then(() => {
+          calculateShipping();
+        });
+      };
+
+      // Update item quantity
+      const updateQuantity = (itemId, quantity) => {
+        const qty = parseInt(quantity);
+        if (qty >= 1 && qty <= 99) {
+          store
+            .dispatch('updateCartItemQuantity', { itemId, quantity: qty })
+            .then(() => {
+              calculateShipping();
+            });
+        }
+      };
+
+      // Increment item quantity
+      const incrementQuantity = itemId => {
+        const item = cartItems.value.find(item => item.id === itemId);
+        if (item && item.quantity < 99) {
+          updateQuantity(itemId, item.quantity + 1);
+        }
+      };
+
+      // Decrement item quantity
+      const decrementQuantity = itemId => {
+        const item = cartItems.value.find(item => item.id === itemId);
+        if (item && item.quantity > 1) {
+          updateQuantity(itemId, item.quantity - 1);
+        }
+      };
+
+      // Clear cart
+      const clearCart = () => {
+        if (confirm('Are you sure you want to clear your cart?')) {
+          store.dispatch('clearCart').then(() => {
+            calculateShipping();
+          });
+        }
+      };
+
+      return {
+        loading,
+        cartItems,
+        cartSubtotal,
+        cartTotal,
+        shipping,
+        discount,
+        calculateItemTotal,
+        removeFromCart,
+        updateQuantity,
+        incrementQuantity,
+        decrementQuantity,
+        clearCart,
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-.cart-item-img {
-  width: 80px;
-  height: 80px;
+  .cart-item-img {
+    width: 80px;
+    height: 80px;
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
-.quantity-selector {
-  .btn-quantity {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    color: #212529;
-    font-weight: bold;
-    padding: 0;
-
-    &:hover:not(:disabled) {
-      background-color: #e9ecef;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    i {
-      font-size: 1rem;
-    }
-  }
-
-  .quantity-input {
-    width: 50px;
-    text-align: center;
-    padding: 0.25rem;
-
-    &::-webkit-inner-spin-button,
-    &::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-  }
-}
-
-.empty-cart {
-  i {
-    opacity: 0.3;
-  }
-}
-
-@media (max-width: 768px) {
-  .cart-item {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
   }
 
   .quantity-selector {
-    width: 100px;
+    .btn-quantity {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      color: #212529;
+      font-weight: bold;
+      padding: 0;
 
-    .btn {
-      padding: 0.25rem 0.5rem;
+      &:hover:not(:disabled) {
+        background-color: #e9ecef;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      i {
+        font-size: 1rem;
+      }
     }
 
-    input {
-      width: 30px;
+    .quantity-input {
+      width: 50px;
+      text-align: center;
       padding: 0.25rem;
+
+      &::-webkit-inner-spin-button,
+      &::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
     }
   }
-}
+
+  .empty-cart {
+    i {
+      opacity: 0.3;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .cart-item {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    .quantity-selector {
+      width: 100px;
+
+      .btn {
+        padding: 0.25rem 0.5rem;
+      }
+
+      input {
+        width: 30px;
+        padding: 0.25rem;
+      }
+    }
+  }
 </style>

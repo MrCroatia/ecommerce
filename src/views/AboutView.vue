@@ -171,59 +171,59 @@
 </template>
 
 <script>
-export default {
-  name: "AboutView",
-};
+  export default {
+    name: 'AboutView',
+  };
 </script>
 
 <style lang="scss" scoped>
-.about-view {
-  .section-title {
-    position: relative;
-    display: inline-block;
-    padding-bottom: 10px;
+  .about-view {
+    .section-title {
+      position: relative;
+      display: inline-block;
+      padding-bottom: 10px;
 
-    &:after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80px;
-      height: 3px;
+      &:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background-color: #f8c146;
+      }
+    }
+
+    .value-icon {
+      height: 70px;
+      width: 70px;
+      line-height: 70px;
+      border-radius: 50%;
+      background-color: rgba(248, 193, 70, 0.1);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: translateY(-5px);
+      }
+    }
+
+    .btn-summer {
       background-color: #f8c146;
+      border-color: #f8c146;
+      color: #212529;
+
+      &:hover {
+        background-color: darken(#f8c146, 10%);
+        border-color: darken(#f8c146, 10%);
+      }
     }
   }
-
-  .value-icon {
-    height: 70px;
-    width: 70px;
-    line-height: 70px;
-    border-radius: 50%;
-    background-color: rgba(248, 193, 70, 0.1);
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .card {
-    transition: transform 0.3s ease;
-
-    &:hover {
-      transform: translateY(-5px);
-    }
-  }
-
-  .btn-summer {
-    background-color: #f8c146;
-    border-color: #f8c146;
-    color: #212529;
-
-    &:hover {
-      background-color: darken(#f8c146, 10%);
-      border-color: darken(#f8c146, 10%);
-    }
-  }
-}
 </style>
