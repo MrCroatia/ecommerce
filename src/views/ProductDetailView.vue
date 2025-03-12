@@ -31,7 +31,7 @@
           >Browse Products</router-link
         >
       </div>
-
+ 
       <div v-else class="row">
         <!-- Product Images -->
         <div class="col-md-6 mb-4 mb-md-0 d-flex">
