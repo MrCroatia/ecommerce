@@ -22,5 +22,17 @@
     </noscript>
     <div id="app"></div>
     <!-- built files will be auto injected -->
+    <script>
+      // Only load Eruda in production
+      if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+          // Use a CDN to load Eruda
+          var script = document.createElement('script');
+          script.src = "//cdn.jsdelivr.net/npm/eruda";
+          document.body.appendChild(script);
+          script.onload = function () {
+              eruda.init();
+          }
+      }
+    </script>
   </body>
 </html>
