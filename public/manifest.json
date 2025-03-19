@@ -1,1 +1,26 @@
-{\n  \"name\": \"SummerShop\",\n  \"short_name\": \"SummerShop\",\n  \"description\": \"Your one-stop shop for summer essentials\",\n  \"start_url\": \"/\",\n  \"display\": \"standalone\",\n  \"background_color\": \"#ffffff\",\n  \"theme_color\": \"#ff7e5f\",\n  \"icons\": [\n    {\n      \"src\": \"/favicon.ico\",\n      \"sizes\": \"64x64 32x32 24x24 16x16\",\n      \"type\": \"image/x-icon\"\n    }\n    // Add more icon sizes for better PWA support\n  ]\n}
+{
+  "name": "SummerShop",
+  "short_name": "SummerShop",
+  "description": "Your one-stop shop for summer essentials",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff7e5f",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/img/icons/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/icons/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
